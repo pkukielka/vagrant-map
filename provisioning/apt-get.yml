@@ -1,0 +1,23 @@
+---
+- hosts: all
+  sudo: yes
+  vars:
+    mirror: mirror://mirrors.ubuntu.com/mirrors.txt
+
+  tasks:
+  - name: Create repositories mirrors list
+    shell: grep -q '$mirror $item' /etc/apt/sources.list || sed -i '1i\deb $mirror $item main restricted universe multiverse\' /etc/apt/sources.list
+    with_items:
+      - precise-security
+      - precise-backports
+      - precise-updates
+      - precise
+
+  - name: Install postgresql and postgis packages
+    apt: pkg=$item update_cache=yes state=latest
+    with_items:
+      - postgresql-server-dev-9.1
+      - postgresql-contrib-9.1
+      - postgresql-9.1-postgis
+      - python-psycopg2
+      - phppgadmin

@@ -1,0 +1,50 @@
+---
+- hosts: all
+  sudo: yes
+  sudo_user: postgres
+  vars:
+    db_name: gis
+    db_user: gisuser
+    db_user_pass: 123
+
+  tasks:
+  - name: Ensure that postgresql server is running
+    service: name=postgresql state=started
+
+  - name: Ensure that postgis_template database exists
+    postgresql_db: db=postgis_template state=present
+    register: createdb_postgis_template
+
+  - name: Make postgis_template a template
+    command: psql -d postgis_template -c "UPDATE pg_database SET datistemplate=true WHERE datname='postgis_template';"
+    only_if: '${createdb_postgis_template.changed}'
+
+  - name: Create extension uuid-ossp on postgis_template
+    command: psql -d postgis_template -c 'CREATE EXTENSION "uuid-ossp";'
+    only_if: '${createdb_postgis_template.changed}'
+
+  - name: Install postgis database extensions
+    command: psql -d postgis_template -f /usr/share/postgresql/9.1/contrib/$item
+    only_if: '${createdb_postgis_template.changed}'
+    with_items:
+      - postgis-1.5/postgis.sql
+      - postgis-1.5/spatial_ref_sys.sql
+      - postgis_comments.sql
+
+  # - name: Ensure that postgres.conf is correct
+  #   copy: src=./files/postgresql.conf dest=/etc/postgresql/9.1/main/postgresql.conf
+  #   notify: restart postgresql
+
+  # - name: Ensure that pg_hba.conf is correct
+  #   copy: src=./files/pg_hba.conf dest=/etc/postgresql/9.1/main/pg_hba.conf
+  #   notify: restart postgresql
+
+  - name: Ensure that all required databases exist
+    postgresql_db: db=$db_name template='postgis_template'
+
+  - name: Ensure that $db_user has proper priviledges
+    postgresql_user: db=$db_name user=$db_user password=$db_user_pass priv=ALL state=present
+
+  handlers:
+    - name: restart postgresql
+      service: name=postgresql state=restarted
