@@ -3,15 +3,20 @@
   sudo: yes
   vars:
     mirror: mirror://mirrors.ubuntu.com/mirrors.txt
+    repo_components: main restricted universe multiverse
 
   tasks:
-  - name: Create repositories mirrors list
-    shell: grep -q '$mirror $item' /etc/apt/sources.list || sed -i '1i\deb $mirror $item main restricted universe multiverse\' /etc/apt/sources.list
+  - name: Install apt-add-repository to enable apt_repository module
+    apt: pkg=python-software-properties update_cache=yes state=latest
+
+  - name: Add additional repositories
+    apt_repository: repo=$item
     with_items:
-      - precise-security
-      - precise-backports
-      - precise-updates
-      - precise
+      - "'deb $mirror precise $repo_components'"
+      - "'deb $mirror precise-updates $repo_components'"
+      - "'deb $mirror precise-backports $repo_components'"
+      - "'deb $mirror precise-security $repo_components'"
+      - ppa:mapnik/v2.1.0
 
   - name: Install postgresql and postgis packages
     apt: pkg=$item update_cache=yes state=latest
@@ -21,3 +26,6 @@
       - postgresql-9.1-postgis
       - python-psycopg2
       - phppgadmin
+      - osm2pgsql
+      - libmapnik
+      - mapnik-utils
