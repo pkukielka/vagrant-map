@@ -19,3 +19,11 @@
 
   - name: Adjust renderd configuration
     shell: sed -i 's/;HOST=.*/HOST=localhost/g' /etc/renderd.conf
+
+  - name: Add mapnik to sites available through apache
+    shell: grep -q $item /etc/apache2/sites-available/default || sed -i '3i\ \t $item\' /etc/apache2/sites-available/default
+    with_items:
+      - 'ModTileMissingRequestTimeout 30'
+      - 'ModTileRequestTimeout 10'
+      - 'ModTileRenderdSocketName /var/run/renderd/renderd.sock'
+      - 'LoadTileConfigFile /usr/local/etc/renderd.conf'
