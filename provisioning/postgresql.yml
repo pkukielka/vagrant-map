@@ -2,10 +2,8 @@
 - hosts: all
   sudo: yes
   sudo_user: postgres
-  vars:
-    db_name: gis
-    db_user: gisuser
-    db_user_pass: 123
+  vars_files:
+    - postgresql_vars.yml
 
   tasks:
   - name: Ensure that postgresql server is running

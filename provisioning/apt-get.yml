@@ -17,10 +17,14 @@
       - "'deb $mirror precise-backports $repo_components'"
       - "'deb $mirror precise-security $repo_components'"
       - ppa:mapnik/v2.1.0
+      - ppa:kakrueger/openstreetmap
 
-  - name: Install postgresql and postgis packages
+  - name: Install all required packages
     apt: pkg=$item update_cache=yes state=latest
     with_items:
+      - subversion
+      - git-core
+      - autoconf
       - postgresql-server-dev-9.1
       - postgresql-contrib-9.1
       - postgresql-9.1-postgis
@@ -29,3 +33,13 @@
       - osm2pgsql
       - libmapnik
       - mapnik-utils
+      - python-mapnik2
+      - apache2
+      - apache2-threaded-dev
+      - apache2-mpm-prefork
+      - apache2-utils
+      - libagg-dev
+      - munin-node
+      - munin
+      - libapache2-mod-tile
+      - openstreetmap-mapnik-stylesheet-data

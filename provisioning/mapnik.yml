@@ -1,0 +1,21 @@
+---
+- hosts: all
+  sudo: yes
+  vars_files:
+    - postgresql_vars.yml
+
+  tasks:
+  - name: Clone mapnik stylesheets from git repository (just for usefull scripts)
+    git: repo=git://github.com/openstreetmap/mapnik-stylesheets.git dest=/opt/mapnik-stylesheets
+
+  - name: Download the coastline data (requires about 400Mb of download)
+    shell: get-coastlines.sh /usr/local/share
+
+  - name: Adjust mapnik configuration to match database configuration
+    shell: cd /etc/mapnik-osm-data/ && /opt/mapnik-stylesheets/generate_xml.py --host localhost --port 5432 --user $db_user --password $db_user_pass --dbname $db_name --symbols /etc/mapnik-osm-data/symbols/ --world_boundaries /usr/share/mapnik-osm-data/world_boundaries/
+
+  - name: Enable tile module for apache
+    shell: echo "LoadModule tile_module /usr/lib/apache2/modules/mod_tile.so" > /etc/apache2/conf.d/mod_tile
+
+  - name: Adjust renderd configuration
+    shell: sed -i 's/;HOST=.*/HOST=localhost/g' /etc/renderd.conf
