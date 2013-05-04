@@ -36,7 +36,7 @@
 
   # Unlucky this task will re-execute every time you will call it (and it's slow)
   - name: Process selected maps
-    shell: osm2pgsql -d gis --cache-strategy sparse /tmp/{{ item.file }}
+    shell: osm2pgsql -d $db_name --cache-strategy sparse /tmp/{{ item.file }}
     sudo_user: postgres
     with_items: $db_imports
 
