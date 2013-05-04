@@ -36,6 +36,17 @@ That's all you need to be up and running.
 Depending on your connection building VM can take a while  
 (~300MB for VM and ~400MB for coastline data need to be dowloaded).
 
+Now you can login to your virtual machine by issuing the following command:
+
+```bash
+vagrant ssh
+```
+
+Thanks to port redirection you can look at imported maps in your host browser.  
+Just go to [http://locahost:8080](http://locahost:8080) to see world map. You can also check
+[Cracow](http://localhost:8080/?zoom=15&lat=50.06013&lon=19.94137&layers=B) or
+[New York](http://localhost:8080/?zoom=10&lat=40.84975&lon=-73.81733&layers=B).
+
 #### Hacking
 I tried to keep everything as simple as possible, so it should be easy to add any custom modifications ;)  
 For start, if you want to add custom maps which should be loaded please look at provisioning/vars.yml file.  
