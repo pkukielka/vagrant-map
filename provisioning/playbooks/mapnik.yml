@@ -1,0 +1,56 @@
+---
+- hosts: all
+  sudo: yes
+  vars_files:
+    - ../vars.yml
+
+  tasks:
+  - name: Download the coastline data (requires about 400Mb of download)
+    shell: '[ -d /usr/local/share/world_boundaries/ ] || get-coastlines.sh /usr/local/share'
+
+  - name: Create directory for mapnik-stylesheets
+    file: path=/opt/mapnik-stylesheets state=directory owner=postgres group=postgres mode=0744
+
+  - name: Clone mapnik stylesheets from git repository (just for usefull scripts)
+    git: repo=git://github.com/openstreetmap/mapnik-stylesheets.git dest=/opt/mapnik-stylesheets
+
+  - name: Adjust mapnik configuration to match database configuration
+    shell: 'cd /etc/mapnik-osm-data/ && /opt/mapnik-stylesheets/generate_xml.py --host localhost --port 5432 --user $db_user --password $db_user_pass --dbname $db_name --symbols /etc/mapnik-osm-data/symbols/ --world_boundaries /usr/share/mapnik-osm-data/world_boundaries/'
+  - name: Enable tile module for apache
+    shell: echo "LoadModule tile_module /usr/lib/apache2/modules/mod_tile.so" > /etc/apache2/conf.d/mod_tile
+
+  - name: Adjust renderd configuration
+    shell: sed -i 's/;HOST=.*/HOST=localhost/g' /etc/renderd.conf
+
+  # - name: Change priviledges for renderd
+  #   shell: chown postgres:postgres /var/run/renderd
+
+  # - name: Modify renderd startup script
+  #   shell: sed -i 's/www-data/postgres/g' /etc/init.d/renderd
+
+  - name: Adjust apache configuration for mapnik
+    shell: grep -q $item /etc/apache2/sites-available/default || sed -i '3i\ \t $item\' /etc/apache2/sites-available/default
+    with_items:
+      - 'ModTileMissingRequestTimeout 30'
+      - 'ModTileRequestTimeout 0'
+      - 'ModTileRenderdSocketName /var/run/renderd/renderd.sock'
+      - 'LoadTileConfigFile /etc/renderd.conf'
+
+  - name: Download selected maps
+    get_url: url={{ item.host }}/{{ item.file }} dest=/tmp owner=postgres group=postgres
+    with_items: $db_imports
+
+  # Unlucky this task will re-execute every time you will call it (and it's slow)
+  - name: Process selected maps
+    shell: osm2pgsql -d gis --cache-strategy sparse /tmp/{{ item.file }}
+    sudo_user: postgres
+    with_items: $db_imports
+
+  - name: Add OpenLayers front page for displaying tiles
+    copy: src=../templates/index.html dest=/var/www/index.html
+
+  - name: Restart renderd service and add it to autostart
+    service: name=renderd state=restarted enabled=yes
+
+  - name: Restart apache service and add it to autostart
+    service: name=apache2 state=restarted enabled=yes

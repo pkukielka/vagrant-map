@@ -3,7 +3,7 @@
   sudo: yes
   sudo_user: postgres
   vars_files:
-    - postgresql_vars.yml
+    - ../vars.yml
 
   tasks:
   - name: Ensure that postgresql server is running
@@ -29,19 +29,14 @@
       - postgis-1.5/spatial_ref_sys.sql
       - postgis_comments.sql
 
-  # - name: Ensure that postgres.conf is correct
-  #   copy: src=./files/postgresql.conf dest=/etc/postgresql/9.1/main/postgresql.conf
-  #   notify: restart postgresql
+  - name: Ensure that postgresql user '$db_user' exists
+    postgresql_user: user=$db_user password=$db_user_pass
 
-  # - name: Ensure that pg_hba.conf is correct
-  #   copy: src=./files/pg_hba.conf dest=/etc/postgresql/9.1/main/pg_hba.conf
-  #   notify: restart postgresql
+  - name: Ensure that all required databases exists
+    postgresql_db: db=$db_name template='postgis_template' owner=$db_user
 
-  - name: Ensure that all required databases exist
-    postgresql_db: db=$db_name template='postgis_template'
-
-  - name: Ensure that $db_user has proper priviledges
-    postgresql_user: db=$db_name user=$db_user password=$db_user_pass priv=ALL state=present
+  - name: Ensure that '$db_user' is owned of '$db_name'
+    command: psql -d $db_name -c 'ALTER TABLE geometry_columns OWNER TO $db_user; ALTER TABLE spatial_ref_sys OWNER TO $db_user;'
 
   handlers:
     - name: restart postgresql

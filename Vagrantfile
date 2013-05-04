@@ -11,11 +11,11 @@ Vagrant.configure("2") do |config|
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine.
-  config.vm.network :forwarded_port, guest: 8090, host: 8090
+  config.vm.network :forwarded_port, guest: 80, host: 8080
 
   config.vm.provision :ansible do |ansible|
     # Point Vagrant at the location of your playbook you want to run.
-    ansible.playbook = "provisioning/main.yml"
+    ansible.playbook = "provisioning/playbooks/main.yml"
     # Direct Vagrant to use an inventory file dedicated to your Vagrant project.
     ansible.inventory_file = "provisioning/ansible_hosts"
   end
@@ -35,7 +35,7 @@ Vagrant.configure("2") do |config|
   config.vm.provider :virtualbox do |vb|
     # Don't boot with headless mode
     # vb.gui = true
-    vb.customize ["modifyvm", :id, "--memory", "512"]
+    vb.customize ["modifyvm", :id, "--memory", "1024"]
     vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
   end
 end

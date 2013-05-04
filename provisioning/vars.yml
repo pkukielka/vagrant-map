@@ -1,0 +1,9 @@
+---
+db_name: gis
+db_user: gisuser
+db_user_pass: 123
+db_imports:
+  - host: http://osm-extracted-metros.s3.amazonaws.com
+    file: new-york.osm.pbf
+  - host: http://osm-extracted-metros.s3.amazonaws.com
+    file: krakow.osm.pbf
