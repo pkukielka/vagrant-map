@@ -22,12 +22,6 @@
   - name: Adjust renderd configuration
     shell: sed -i 's/;HOST=.*/HOST=localhost/g' /etc/renderd.conf
 
-  # - name: Change priviledges for renderd
-  #   shell: chown postgres:postgres /var/run/renderd
-
-  # - name: Modify renderd startup script
-  #   shell: sed -i 's/www-data/postgres/g' /etc/init.d/renderd
-
   - name: Adjust apache configuration for mapnik
     shell: grep -q $item /etc/apache2/sites-available/default || sed -i '3i\ \t $item\' /etc/apache2/sites-available/default
     with_items:
