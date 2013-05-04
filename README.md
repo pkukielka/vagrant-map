@@ -17,6 +17,7 @@ Right now provided VM contains:
   - PostgreSQL v. 9.1
   - Mapnik v. 2.1
   - Apache 2 with mod_tile
+  - psycopg2, phppgadmin, osm2pgsql and mapnik-stylesheet
   - Some additional utilities (look at provisioning/playbooks/apt-get.yml to see all installed packages)
 
 All automatically installed and configured to work with each other.
