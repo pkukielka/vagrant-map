@@ -16,6 +16,7 @@
 
   - name: Adjust mapnik configuration to match database configuration
     shell: 'cd /etc/mapnik-osm-data/ && /opt/mapnik-stylesheets/generate_xml.py --host localhost --port 5432 --user $db_user --password $db_user_pass --dbname $db_name --symbols /etc/mapnik-osm-data/symbols/ --world_boundaries /usr/share/mapnik-osm-data/world_boundaries/'
+
   - name: Enable tile module for apache
     shell: echo "LoadModule tile_module /usr/lib/apache2/modules/mod_tile.so" > /etc/apache2/conf.d/mod_tile
 
@@ -23,12 +24,7 @@
     shell: sed -i 's/;HOST=.*/HOST=localhost/g' /etc/renderd.conf
 
   - name: Adjust apache configuration for mapnik
-    shell: grep -q $item /etc/apache2/sites-available/default || sed -i '3i\ \t $item\' /etc/apache2/sites-available/default
-    with_items:
-      - 'ModTileMissingRequestTimeout 30'
-      - 'ModTileRequestTimeout 0'
-      - 'ModTileRenderdSocketName /var/run/renderd/renderd.sock'
-      - 'LoadTileConfigFile /etc/renderd.conf'
+    copy: src=../templates/sites-available.default dest=/etc/apache2/sites-available/default
 
   - name: Download selected maps
     get_url: url={{ item.host }}/{{ item.file }} dest=/tmp owner=postgres group=postgres

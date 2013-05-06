@@ -22,7 +22,7 @@ Right now provided VM contains:
 
 All automatically installed and configured to work with each other.
 
-#### Installation
+#### Installation and usage
 To build your own Vagrant VM you need to have latest versions of 
 [Vagrant](http://www.vagrantup.com/) and [Ansible](http://ansible.cc/).  
 If you don't have it yet, you need to install git and VirtualBox as well.
@@ -47,6 +47,9 @@ Thanks to port redirection you can look at imported maps in your host browser.
 Just go to [http://locahost:8080](http://locahost:8080) to see world map. You can also check
 [Cracow](http://localhost:8080/?zoom=15&lat=50.06013&lon=19.94137&layers=B) or
 [New York](http://localhost:8080/?zoom=10&lat=40.84975&lon=-73.81733&layers=B).
+
+It's also possible to connect to your PostgreSQL database from the host machine.  
+By default port forwarding is set to listen on port 5432 on host machine, same as on guest.
 
 #### Hacking
 I tried to keep everything as simple as possible, so it should be easy to add any custom modifications ;)  

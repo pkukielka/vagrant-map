@@ -38,6 +38,18 @@
   - name: Ensure that '$db_user' is owned of '$db_name'
     command: psql -d $db_name -c 'ALTER TABLE geometry_columns OWNER TO $db_user; ALTER TABLE spatial_ref_sys OWNER TO $db_user;'
 
+- hosts: all
+  sudo: yes
+
+  tasks:
+  - name: Ensure that postgres.conf is correct
+    copy: src=../templates/postgresql.conf dest=/etc/postgresql/9.1/main/postgresql.conf
+    notify: restart postgresql
+
+  - name: Ensure that pg_hba.conf is correct
+    copy: src=../templates/pg_hba.conf dest=/etc/postgresql/9.1/main/pg_hba.conf
+    notify: restart postgresql
+
   handlers:
     - name: restart postgresql
       service: name=postgresql state=restarted
