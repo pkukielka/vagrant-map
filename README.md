@@ -17,6 +17,7 @@ Right now provided VM contains:
   - PostgreSQL v. 9.1
   - Mapnik v. 2.1
   - Apache 2 with mod_tile
+  - pgRouting 1.05
   - psycopg2, phppgadmin, osm2pgsql and mapnik-stylesheet
   - Some additional utilities (look at provisioning/playbooks/apt-get.yml to see all installed packages)
 
@@ -69,14 +70,13 @@ Just be sure that you have only localhost added to your ``` /etc/ansible/hosts``
 in all vagrant-map playbooks to match your machine name. If this description doesn't make sense to you  
 try to read about [ansible inventory & patterns](http://ansible.cc/docs/patterns.html) first.
 
-If for any reason you will need to create next database you can use 'postgis_template' template:
+If you will need to create next database you can use 'template_postgis' and 'template_routing' templates:
 
 ```bash
-createdb -T postgis_template new_database
+createdb -T template_postgis new_database
 ```
 
 #### ToDo
 
 - Create separate playbook with postgresql, postgis and whole environment optimizations
-- Change default database encoding to utf-8
 - ...?

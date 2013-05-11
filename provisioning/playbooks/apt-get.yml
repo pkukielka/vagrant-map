@@ -6,6 +6,9 @@
     repo_components: main restricted universe multiverse
 
   tasks:
+  - name: Ensure that system locale is set to 'en_US.UTF8'
+    shell: update-locale LC_ALL=en_US.UTF8 LANG=en_US.UTF8
+
   - name: Install apt-add-repository to enable apt_repository module
     apt: pkg=python-software-properties update_cache=yes state=latest
 
@@ -18,6 +21,7 @@
       - "'deb $mirror precise-security $repo_components'"
       - ppa:mapnik/v2.1.0
       - ppa:kakrueger/openstreetmap
+      - ppa:georepublic/pgrouting
 
   - name: Install all required packages
     apt: pkg=$item update_cache=yes state=latest
@@ -25,21 +29,31 @@
       - subversion
       - git-core
       - autoconf
+      # postgreslq and postgis
       - postgresql-server-dev-9.1
       - postgresql-contrib-9.1
       - postgresql-9.1-postgis
       - python-psycopg2
       - phppgadmin
       - osm2pgsql
+      # mapnik
       - libmapnik
       - mapnik-utils
       - python-mapnik2
+      - openstreetmap-mapnik-stylesheet-data
+      - libagg-dev
+      # apache and utils
       - apache2
       - apache2-threaded-dev
       - apache2-mpm-prefork
       - apache2-utils
-      - libagg-dev
       - munin-node
       - munin
       - libapache2-mod-tile
-      - openstreetmap-mapnik-stylesheet-data
+      # pgrouting
+      - gaul-devel
+      - postgresql-9.1-pgrouting
+      - postgresql-9.1-pgrouting-dd
+      - postgresql-9.1-pgrouting-tsp
+      - pgrouting-workshop
+      - osm2pgrouting
